@@ -4,13 +4,13 @@
     define(["moment"], function (a0) {
       return (root['DateRange'] = factory(a0));
     });
-  } else if (typeof exports === 'object') {
+  } else if (typeof module === 'object' && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
     module.exports = factory(require("moment"));
   } else {
-    root['DateRange'] = factory(moment);
+    root['DateRange'] = factory(root["moment"]);
   }
 }(this, function (moment) {
 
@@ -117,7 +117,20 @@ DateRange.prototype.contains = function(other, exclusive) {
  * @return {!boolean}
  */
 DateRange.prototype.overlaps = function(range) {
-  return this.intersect(range) !== null;
+  var start = this.start.valueOf();
+  var end   = this.end.valueOf();
+	var otherStart = range.start.valueOf();
+	var otherEnd   = range.end.valueOf();
+
+  if (((start <= otherStart) && (otherStart < end) && (end < otherEnd)) ||
+    ((otherStart < start) && (start < otherEnd) && (otherEnd <= end)) ||
+    ((otherStart < start) && (start <= end) && (end < otherEnd)) ||
+    ((start <= otherStart) && (otherStart <= otherEnd) && (otherEnd <= end))
+  ) {
+    return true;
+  }
+
+  return false;
 };
 
 /**
